@@ -1,2 +1,4 @@
 # use-filters
-Created with CodeSandbox
+
+
+🗄 A hook to help you manage filters.
