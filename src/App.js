@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 import useFilters from "./useFilters";
 
 import "./styles.css";
@@ -23,13 +24,17 @@ var users = [
   { id: 7, name: "User G" }
 ];
 
+const getId = (item) => item.id;
+
 export default function App() {
-  const { filters, updaters } = useFilters({
-    search: "",
-    startDate: "",
-    endDate: "",
-    users: [],
-    products: []
+  const { filters, updaters, reset, selectAll } = useFilters({
+    search: "Initial Search",
+    users: users.map(getId),
+    products: products.map(getId),
+    dateRange: {
+      startDate: moment().format("YYYY-MM-DD"),
+      endDate: moment().subtract(7, "day").format("YYYY-MM-DD")
+    }
   });
 
   return (
@@ -38,6 +43,9 @@ export default function App() {
       <pre style={{ border: "1px solid black", padding: 10 }}>
         {JSON.stringify(filters, null, 2)}
       </pre>
+      <button type="button" onClick={reset}>
+        Reset
+      </button>
       <h2>Search</h2>
       <label htmlFor="search">Search: </label>
       <input
@@ -52,8 +60,13 @@ export default function App() {
       <input
         name="startDate"
         type="date"
-        value={filters.startDate}
-        onChange={(e) => updaters.startDateUpdater(e.target.value)}
+        value={filters.dateRange.startDate}
+        onChange={(e) =>
+          updaters.dateRangeUpdater({
+            ...filters.dateRange,
+            startDate: e.target.value
+          })
+        }
       />
       <br />
       <br />
@@ -61,10 +74,21 @@ export default function App() {
       <input
         name="endDate"
         type="date"
-        value={filters.endDate}
-        onChange={(e) => updaters.endDateUpdater(e.target.value)}
+        value={filters.dateRange.endDate}
+        onChange={(e) =>
+          updaters.dateRangeUpdater({
+            ...filters.dateRange,
+            endDate: e.target.value
+          })
+        }
       />
       <h2>Users</h2>
+      <label> Select All(Users): </label>
+      <input
+        type="checkbox"
+        checked={filters.users.length === users.length}
+        onChange={() => selectAll.usersSelectAll(users)}
+      />
       <ul style={{ listStyle: "none" }}>
         {users.map((user) => (
           <li key={user.id}>
@@ -78,6 +102,12 @@ export default function App() {
         ))}
       </ul>
       <h2>Products</h2>
+      <label> Select All(Products): </label>
+      <input
+        type="checkbox"
+        checked={filters.products.length === products.length}
+        onChange={() => selectAll.productsSelectAll(products)}
+      />
       <ul style={{ listStyle: "none" }}>
         {products.map((product) => (
           <li key={product.id}>
